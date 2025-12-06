@@ -4,6 +4,9 @@
 
 This plugin enhances Blender's native playblast, providing convenient features that allow one-click animation preview, temporary modification of video properties, and easy addition of custom information to videos.
 
+You can install it from official extension website:
+<https://extensions.blender.org/add-ons/anim-reviewer/>
+
 ![demonstrate](images/demonstrate.gif)
 
 ## System Requirements

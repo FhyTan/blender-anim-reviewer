@@ -2,6 +2,9 @@
 
 该插件增强 Blender 原生的拍屏，提供一些便利功能，可以一键拍屏预览动画，临时修改视频属性，还能方便的添加自定义信息到视频上
 
+你可以从官方插件库安装：
+<https://extensions.blender.org/add-ons/anim-reviewer/>
+
 ![demonstrate](images/demonstrate.gif)
 
 ## 系统要求
