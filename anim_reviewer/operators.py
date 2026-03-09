@@ -420,7 +420,7 @@ class ANIM_REVIEWER_OT_run(bpy.types.Operator):
 
             play_video(output_path)
 
-            if "OCIO" in os.environ and bpy.app.version < (5, 0):
+            if os.environ.get("OCIO") and bpy.app.version < (5, 0):
                 self.report(
                     {"WARNING"},
                     rpt_(
