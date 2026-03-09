@@ -16,7 +16,15 @@ def get_full_font_name(ttf_path) -> str:
 
 
 def detect_ffmpeg() -> bool:
-    return shutil.which("ffmpeg") is not None
+    if shutil.which("ffmpeg"):
+        return True
+
+    # Fallback: try running "ffmpeg -version" to check if it's available in the system PATH.
+    try:
+        subprocess.check_output(["ffmpeg", "-version"], stderr=subprocess.STDOUT)
+        return True
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        return False
 
 
 def play_video(video_path: str):
