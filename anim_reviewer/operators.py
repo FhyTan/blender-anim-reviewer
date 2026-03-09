@@ -417,7 +417,17 @@ class ANIM_REVIEWER_OT_run(bpy.types.Operator):
                     msgid='Playblast completed, saved to "{}", opening video...'
                 ).format(output_path),
             )
+
             play_video(output_path)
+
+            if "OCIO" in os.environ and bpy.app.version < (5, 0):
+                self.report(
+                    {"WARNING"},
+                    rpt_(
+                        "OCIO environment variable detected. Video playback may crash on Blender versions before 5.0\n"
+                        "If you encounter a crash, please try to unset OCIO environment variable or upgrade to Blender 5.0 or later."
+                    ),
+                )
         except subprocess.CalledProcessError:
             self.report(
                 {"ERROR"},
