@@ -6,3 +6,5 @@ try/
 dist/
 blender/
 i18n/
+.vscode/
+.blender_dev/

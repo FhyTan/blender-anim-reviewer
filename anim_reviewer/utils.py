@@ -1,4 +1,5 @@
 import os
+import platform
 import shutil
 import subprocess
 
@@ -135,7 +136,14 @@ def play_video(video_path: str):
     print("Executing command:\n ", " ".join(quote(c) for c in cmd))
 
     try:
-        subprocess.Popen(cmd)
+        if platform.system() == "Windows":
+            # CREATE_NEW_CONSOLE option can make the player display on top of the Blender window.
+            subprocess.Popen(
+                cmd, shell=True, creationflags=subprocess.CREATE_NEW_CONSOLE
+            )
+        else:
+            # On non-Windows platforms, just launch the player without creating a new console.
+            subprocess.Popen(cmd)
     except Exception as ex:
         err_msg = rpt_(
             "Couldn't run external animation player with command {!r}\n{:s}"
