@@ -1,7 +1,7 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 msgid ""
 msgstr ""
-"Project-Id-Version: Playblast 1.0.0 (0)\n"
+"Project-Id-Version: Playblast 1.0.1 (0)\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-27 02:58+0800\n"
 "PO-Revision-Date: 2025-11-07 10:00+0800\n"
