@@ -139,6 +139,16 @@ class ANIM_REVIEWER_OT_run(bpy.types.Operator):
         "Please ensure you have an active camera and ffmpeg is installed in your system."
     )
 
+    # 是否在完成后自动打开播放器；批量脚本请设置为 False 以避免弹出播放器。
+    launch_player: bpy.props.BoolProperty(
+        name="Launch Player",
+        description=(
+            "Whether to open the video player after playblast. "
+            "For batch scripts set to False to prevent popping up the player."
+        ),
+        default=True,
+    )
+
     @classmethod
     def poll(cls, context: bpy.types.Context) -> bool:
         return context.area.type == "VIEW_3D" and context.scene.camera is not None
@@ -411,14 +421,24 @@ class ANIM_REVIEWER_OT_run(bpy.types.Operator):
         try:
             print("Executing command:", ffmpeg_cmd)
             subprocess.run(ffmpeg_cmd, shell=True, check=True)
-            self.report(
-                {"INFO"},
-                rpt_(
-                    msgid='Playblast completed, saved to "{}", opening video...'
-                ).format(output_path),
-            )
 
-            play_video(output_path)
+            # 根据 launch_player 参数决定是否打开播放器
+            if getattr(self, "launch_player", True):
+                self.report(
+                    {"INFO"},
+                    rpt_(
+                        msgid='Playblast completed, saved to "{}", opening video...'
+                    ).format(output_path),
+                )
+
+                play_video(output_path)
+            else:
+                self.report(
+                    {"INFO"},
+                    rpt_(msgid='Playblast completed, saved to "{}"').format(
+                        output_path
+                    ),
+                )
 
             if os.environ.get("OCIO") and bpy.app.version < (5, 0):
                 self.report(
