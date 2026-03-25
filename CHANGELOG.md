@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.2
+
+- Auto-detect the area used for playblast, allowing you to call `bpy.ops.render.anim_review()` directly from the script editor.
+- Add the `launch_player` parameter to the playblast operator to prevent the player from opening during batch scripts.
+
 ## 1.0.1
 
 - Modified the logic for detecting whether `ffmpeg` is installed; fixes an issue where `ffmpeg` was not detected on macOS.
