@@ -139,7 +139,6 @@ class ANIM_REVIEWER_OT_run(bpy.types.Operator):
         "Please ensure you have an active camera and ffmpeg is installed in your system."
     )
 
-    # 是否在完成后自动打开播放器；批量脚本请设置为 False 以避免弹出播放器。
     launch_player: bpy.props.BoolProperty(
         name="Launch Player",
         description=(
@@ -158,6 +157,8 @@ class ANIM_REVIEWER_OT_run(bpy.types.Operator):
 
     @staticmethod
     def get_view_3d_area(context: bpy.types.Context) -> bpy.types.Area | None:
+        """Auto-detect the 3D View area."""
+
         if context.area.type == "VIEW_3D":
             return context.area
 
@@ -441,7 +442,7 @@ class ANIM_REVIEWER_OT_run(bpy.types.Operator):
             print("Executing command:", ffmpeg_cmd)
             subprocess.run(ffmpeg_cmd, shell=True, check=True)
 
-            # 根据 launch_player 参数决定是否打开播放器
+            # Following launch_player logic to decide whether to open video after playblast
             if getattr(self, "launch_player", True):
                 self.report(
                     {"INFO"},

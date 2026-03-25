@@ -14,8 +14,8 @@ translations_tuple = (
         ((), ()),
         (
             "zh_HANS",
-            "Project-Id-Version: Playblast 1.0.1 (0)\nReport-Msgid-Bugs-To: \nPOT-Creation-Date: 2025-10-27 02:58+0800\nPO-Revision-Date: 2025-11-07 10:00+0800\nLast-Translator: GitHub Copilot <EMAIL@ADDRESS>\nLanguage-Team: Chinese Simplified <LL@li.org>\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit",
-            (False, ("FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.",)),
+            "Project-Id-Version: AnimReviewer 1.0.2 (0)\nReport-Msgid-Bugs-To: \nPOT-Creation-Date: 2025-10-27 02:58+0800\nPO-Revision-Date: 2025-11-07 10:00+0800\nLast-Translator: GitHub Copilot <EMAIL@ADDRESS>\nLanguage-Team: Chinese Simplified <LL@li.org>\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit",
+            (False, ("FIRST AUTHOR <FhyTan@outlook.com>, 2023.",)),
         ),
     ),
     (
