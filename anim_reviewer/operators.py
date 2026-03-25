@@ -151,7 +151,21 @@ class ANIM_REVIEWER_OT_run(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context: bpy.types.Context) -> bool:
-        return context.area.type == "VIEW_3D" and context.scene.camera is not None
+        return (
+            cls.get_view_3d_area(context) is not None
+            and context.scene.camera is not None
+        )
+
+    @staticmethod
+    def get_view_3d_area(context: bpy.types.Context) -> bpy.types.Area | None:
+        if context.area.type == "VIEW_3D":
+            return context.area
+
+        for area in context.screen.areas:
+            if area.type == "VIEW_3D":
+                return area
+
+        return None
 
     def execute(self, context: bpy.types.Context):
         # First detect whether ffmpeg is installed
@@ -162,7 +176,12 @@ class ANIM_REVIEWER_OT_run(bpy.types.Operator):
             )
             return {"CANCELLED"}
 
+        # Enter view 3D area to ensure correct context for rendering
+        area = self.get_view_3d_area(context)
+        region = next(r for r in area.regions if r.type == "WINDOW")
+
         with (
+            bpy.context.temp_override(area=area, region=region),
             TemporaryDirectory(prefix="blender_anim_reviewer_") as temp_dir,
             render_properties_override(context),
             register_collect_metadata_handler(context),
