@@ -42,6 +42,9 @@ def render_properties_override(context: bpy.types.Context):
     filepath = render.filepath
     use_file_extension = render.use_file_extension
     use_render_cache = render.use_render_cache
+
+    if bpy.app.version >= (5, 0):
+        media_type = render.image_settings.media_type
     file_format = render.image_settings.file_format
     color_mode = render.image_settings.color_mode
     color_depth = render.image_settings.color_depth
@@ -69,6 +72,9 @@ def render_properties_override(context: bpy.types.Context):
 
     render.use_file_extension = True
     render.use_render_cache = False
+
+    if bpy.app.version >= (5, 0):
+        render.image_settings.media_type = "IMAGE"
     render.image_settings.file_format = "PNG"
     render.image_settings.color_mode = "RGB"
     render.image_settings.color_depth = "8"
@@ -99,6 +105,9 @@ def render_properties_override(context: bpy.types.Context):
         render.filepath = filepath
         render.use_file_extension = use_file_extension
         render.use_render_cache = use_render_cache
+
+        if bpy.app.version >= (5, 0):
+            render.image_settings.media_type = media_type
         render.image_settings.file_format = file_format
         render.image_settings.color_mode = color_mode
         render.image_settings.color_depth = color_depth
