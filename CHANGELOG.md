@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.3
+
+- Fixed a crash when running playblast with the output media type set to video in Blender versions above 5.0.
+
 ## 1.0.2
 
 - Auto-detect the area used for playblast, allowing you to call `bpy.ops.render.anim_review()` directly from the script editor.
