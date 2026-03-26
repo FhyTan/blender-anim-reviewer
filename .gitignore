@@ -8,3 +8,5 @@ blender/
 i18n/
 .vscode/
 .blender_dev/
+.pytest_cache/
+.env

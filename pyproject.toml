@@ -7,4 +7,8 @@ requires-python = ">=3.11"
 dependencies = ["fonttools>=4.60.1"]
 
 [dependency-groups]
-dev = ["bpy>=4.5", "fake-bpy-module>=20251003"]
+dev = [
+    "bpy>=4.5",
+    "fake-bpy-module>=20251003",
+    "pytest>=9.0.2",
+]
