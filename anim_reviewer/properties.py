@@ -9,7 +9,7 @@ class VideoProperties(bpy.types.PropertyGroup):
         name="Include Audio",
         description="Include audio in the playblast video",
         default=True,
-    )
+    )  # type: ignore
 
     codec: bpy.props.EnumProperty(
         name="Video Codec",
@@ -21,7 +21,7 @@ class VideoProperties(bpy.types.PropertyGroup):
             ("libsvtav1", "AV1", "AV1 codec"),
         ],
         default="libx264",
-    )
+    )  # type: ignore
 
 
 class OverrideProperties(bpy.types.PropertyGroup):
@@ -32,7 +32,7 @@ class OverrideProperties(bpy.types.PropertyGroup):
         default=50,
         min=1,
         max=100,
-    )
+    )  # type: ignore
 
     use_frame_range: bpy.props.BoolProperty(
         name="Use Frame Range",
@@ -41,27 +41,27 @@ class OverrideProperties(bpy.types.PropertyGroup):
             "If disabled, the playblast will use the scene's start and end frames"
         ),
         default=False,
-    )
+    )  # type: ignore
 
     frame_start: bpy.props.IntProperty(
         name="Start Frame",
         description="Start frame for the playblast",
         default=1,
         min=0,
-    )
+    )  # type: ignore
 
     frame_end: bpy.props.IntProperty(
         name="End Frame",
         description="End frame for the playblast",
         default=250,
         min=0,
-    )
+    )  # type: ignore
 
     show_overlays: bpy.props.BoolProperty(
         name="Show Overlays",
         description="Show overlays like gizmos and outlines in the playblast",
         default=False,
-    )
+    )  # type: ignore
 
     use_viewport_shading: bpy.props.BoolProperty(
         name="Use Viewport Shading",
@@ -70,7 +70,7 @@ class OverrideProperties(bpy.types.PropertyGroup):
             "If disabled, the playblast will use the scene's viewport shading mode"
         ),
         default=False,
-    )
+    )  # type: ignore
 
     viewport_shading: bpy.props.EnumProperty(
         name="Viewport Shading",
@@ -82,7 +82,7 @@ class OverrideProperties(bpy.types.PropertyGroup):
             ("RENDERED", "", "Rendered shading", "SHADING_RENDERED", 4),
         ],
         default="MATERIAL",
-    )
+    )  # type: ignore
 
 
 def get_version_str(self):
@@ -129,26 +129,26 @@ class FileProperties(bpy.types.PropertyGroup):
         if bpy.app.version >= (4, 5)
         else set(),
         default="//",
-    )
+    )  # type: ignore
 
     name: bpy.props.StringProperty(
         name="File Name",
         description="Base name for playblast file",
         default="playblast",
-    )
+    )  # type: ignore
 
     use_version: bpy.props.BoolProperty(
         name="Use Version",
         description="",
         default=True,
-    )
+    )  # type: ignore
 
     version: bpy.props.IntProperty(
         name="Version",
         description="Version number for the playblast file",
         default=1,
         min=0,
-    )
+    )  # type: ignore
 
     extension: bpy.props.EnumProperty(
         name="Extension",
@@ -160,7 +160,7 @@ class FileProperties(bpy.types.PropertyGroup):
             (".mkv", ".mkv", "MKV format"),
         ],
         default=".mp4",
-    )
+    )  # type: ignore
 
     version_str: bpy.props.StringProperty(
         name="Version String",
@@ -169,14 +169,14 @@ class FileProperties(bpy.types.PropertyGroup):
         "If version is 1, return v001."
         "Else return empty string.",
         get=get_version_str,
-    )
+    )  # type: ignore
 
     full_path: bpy.props.StringProperty(
         name="Full Path",
         description="Read-only properties.\n"
         "Join all parts to get the full path of the playblast file.",
         get=get_full_path,
-    )
+    )  # type: ignore
 
 
 def burn_in_preview_update(self, context):
@@ -192,7 +192,7 @@ class BurnInProperties(bpy.types.PropertyGroup):
         description="Enable burn-in text overlay on the playblast.",
         default=False,
         update=burn_in_preview_update,
-    )
+    )  # type: ignore
 
     preview: bpy.props.BoolProperty(
         name="Preview in Viewport",
@@ -200,26 +200,26 @@ class BurnInProperties(bpy.types.PropertyGroup):
         "You need to be in Camera view to see it",
         default=True,
         update=burn_in_preview_update,
-    )
+    )  # type: ignore
 
     font_family: bpy.props.StringProperty(
         name="Font Family",
         description="Font family for the burn-in text",
         subtype="FILE_PATH",
         default="",
-    )
+    )  # type: ignore
 
     font_size: bpy.props.IntProperty(
         name="Font Size",
         description="Size of the burn-in text font",
         default=40,
-    )
+    )  # type: ignore
 
     margin: bpy.props.IntProperty(
         name="Margin",
         description="Text margin from the edges of the viewport",
         default=10,
-    )
+    )  # type: ignore
 
     color: bpy.props.FloatVectorProperty(
         name="Color",
@@ -229,50 +229,50 @@ class BurnInProperties(bpy.types.PropertyGroup):
         min=0.0,
         max=1.0,
         default=(1.0, 1.0, 1.0, 1.0),
-    )
+    )  # type: ignore
 
     top_left: bpy.props.StringProperty(
         name="Top Left",
         description="Text to display in the top left corner",
         default=r"File: {file_name} {file_version}",
-    )
+    )  # type: ignore
 
     top_center: bpy.props.StringProperty(
         name="Top Center",
         description="Text to display in the top center",
         default=r"",
-    )
+    )  # type: ignore
 
     top_right: bpy.props.StringProperty(
         name="Top Right",
         description="Text to display in the top right corner",
         default=r"Date: {datetime}",
-    )
+    )  # type: ignore
 
     bottom_left: bpy.props.StringProperty(
         name="Bottom Left",
         description="Text to display in the bottom left corner",
         default=r"Resolution: {width}x{height}",
-    )
+    )  # type: ignore
 
     bottom_center: bpy.props.StringProperty(
         name="Bottom Center",
         description="Text to display in the bottom center",
         default=r"Camera: {camera_name} {camera_focal}mm",
-    )
+    )  # type: ignore
 
     bottom_right: bpy.props.StringProperty(
         name="Bottom Right",
         description="Text to display in the bottom right corner",
         default=r"Frame: {frame_current} | {frame_start}-{frame_end} | {frame_rate} fps",
-    )
+    )  # type: ignore
 
 
 class AnimReviewerProperties(bpy.types.PropertyGroup):
-    video: bpy.props.PointerProperty(type=VideoProperties)
-    override: bpy.props.PointerProperty(type=OverrideProperties)
-    file: bpy.props.PointerProperty(type=FileProperties)
-    burn_in: bpy.props.PointerProperty(type=BurnInProperties)
+    video: bpy.props.PointerProperty(type=VideoProperties)  # type: ignore
+    override: bpy.props.PointerProperty(type=OverrideProperties)  # type: ignore
+    file: bpy.props.PointerProperty(type=FileProperties)  # type: ignore
+    burn_in: bpy.props.PointerProperty(type=BurnInProperties)  # type: ignore
 
 
 classes = (

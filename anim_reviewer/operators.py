@@ -155,7 +155,7 @@ class ANIM_REVIEWER_OT_run(bpy.types.Operator):
             "For batch scripts set to False to prevent popping up the player."
         ),
         default=True,
-    )
+    ) # type: ignore
 
     @classmethod
     def poll(cls, context: bpy.types.Context) -> bool:
@@ -491,7 +491,7 @@ class ANIM_REVIEWER_OT_import_settings(bpy.types.Operator, ImportHelper):
     bl_description = "Import Anim Reviewer settings from a file"
 
     filename_ext = ".json"
-    filter_glob: bpy.props.StringProperty(default="*.json", options={"HIDDEN"})
+    filter_glob: bpy.props.StringProperty(default="*.json", options={"HIDDEN"}) # type: ignore
 
     def execute(self, context):
         anim_reviewer = context.scene.anim_reviewer
@@ -518,7 +518,7 @@ class ANIM_REVIEWER_OT_export_settings(bpy.types.Operator, ExportHelper):
     bl_description = "Export current Anim Reviewer settings to a file"
 
     filename_ext = ".json"
-    filter_glob: bpy.props.StringProperty(default="*.json", options={"HIDDEN"})
+    filter_glob: bpy.props.StringProperty(default="*.json", options={"HIDDEN"}) # type: ignore
 
     def execute(self, context: bpy.types.Context):
         anim_reviewer = context.scene.anim_reviewer
