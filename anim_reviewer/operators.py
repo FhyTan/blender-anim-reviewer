@@ -12,7 +12,7 @@ from bl_operators.presets import AddPresetBase
 from bpy.app.translations import pgettext_rpt as rpt_
 from bpy_extras.io_utils import ExportHelper, ImportHelper
 
-from .metadata import get_metadata
+from .metadata import get_metadata, resolve_text
 from .paths import BFONT_PATH, TEMPLATE_ASS_PATH
 from .utils import detect_ffmpeg, get_full_font_name, play_video
 
@@ -367,7 +367,7 @@ class ANIM_REVIEWER_OT_run(bpy.types.Operator):
             for pos, align, x, y in vars:
                 text = getattr(anim_reviewer.burn_in, pos)
                 try:
-                    text = text.format_map(metadata)
+                    text = resolve_text(text, metadata)
                 except Exception:
                     self.report(f'Error burn in text in {pos}: "{text}"')
                     continue

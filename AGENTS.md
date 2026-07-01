@@ -55,6 +55,8 @@ Output goes to `dist/`.
 - Test fixture `create_camera_and_cube` sets up a minimal scene with camera and tracked cube.
 - Playblast test (`test_playblast_with_different_system_output_file_format`) is skipped on Blender >= 5.0.
 
+> **Note**: Do not run `pytest` during development — the test environment (`bpy` 311MiB download) is not yet set up and will hang the session. Tests are only run in CI or by the developer locally.
+
 ## UV (package manager)
 
 This project uses `uv` (not pip). Lockfile: `uv.lock`. Python requirement: `>=3.11` (`.python-version`).
@@ -66,6 +68,10 @@ This project uses `uv` (not pip). Lockfile: `uv.lock`. Python requirement: `>=3.
 
 - VSCode settings in `.vscode/settings.json` configure `BLENDER_USER_RESOURCES` to `.blender_dev/` and pytest args.
 - `.gitignore` ignores `.venv/`, `dist/`, `blender/`, `i18n/`, `.vscode/`, `.blender_dev/`.
+
+## Language
+
+All code, comments, docstrings, and logging must be in English. Non-English text is only permitted in `anim_reviewer/translations.py`.
 
 ## Translations
 

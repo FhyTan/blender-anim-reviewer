@@ -10,7 +10,7 @@ import gpu
 from bpy_extras.view3d_utils import location_3d_to_region_2d
 from gpu_extras.batch import batch_for_shader
 
-from .metadata import get_metadata
+from .metadata import get_metadata, resolve_text
 from .paths import BFONT_PATH
 
 logger = logging.getLogger(__name__)
@@ -158,7 +158,7 @@ def preview_burn_in_handler():
     for pos, get_position in positions:
         text = getattr(anim_reviewer.burn_in, pos)
         try:
-            text = text.format_map(metadata)
+            text = resolve_text(text, metadata)
         except Exception:
             logger.error(f'Error burn in text in {pos}: "{text}"')
             continue

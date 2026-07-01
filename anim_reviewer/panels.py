@@ -166,7 +166,7 @@ class ANIM_REVIEWER_PT_burn_in_help(bpy.types.Panel):
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
     bl_category = "Tool"
-    bl_ui_units_x = 25
+    bl_ui_units_x = 30
     bl_options = {"INSTANCED"}
 
     def draw(self, context: bpy.types.Context):
@@ -176,11 +176,18 @@ class ANIM_REVIEWER_PT_burn_in_help(bpy.types.Panel):
             text="Use curly braces {} to denote variables in text, for example {datetime} for the current time."
         )
         layout.label(text="The following variables are currently available:")
-
         grid = layout.grid_flow(row_major=True, columns=2)
         for key, description in META_DATA_DESCRIPTIONS.items():
             grid.label(text=f"{{{key}}}")
             grid.label(text=description)
+
+        layout.separator()
+        layout.label(
+            text='You can also use the text like "{bpy.data.objects["Cube"].location[0]}" to access any Blender RNA data.'
+        )
+        layout.label(
+            text='Tip: right-click any property, choose "Copy Full Data Path", then paste inside curly braces.'
+        )
 
 
 class ANIM_REVIEWER_PT_settings(bpy.types.Panel):

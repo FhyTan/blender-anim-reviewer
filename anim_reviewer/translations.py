@@ -527,5 +527,13 @@ translations_dict["zh_HANS"].update(
         ("*", "Focal length of the active camera in mm"): "激活相机的焦距（毫米）",
         ("*", "Sensor width of the active camera in mm"): "激活相机的传感器宽度（毫米）",
         ("*", "Sensor height of the active camera in mm"): "激活相机的传感器高度（毫米）",
+        (
+            "*",
+            'You can also use the text like "{bpy.data.objects["Cube"].location[0]}" to access any Blender RNA data.',
+        ): '你也可以使用 RNA 路径来获取任意 Blender 数据，比如 "{bpy.data.objects[\"Cube\"].location[0]}"',
+        (
+            "*",
+            'Tip: right-click any property, choose "Copy Full Data Path", then paste inside curly braces.',
+        ): "提示：在任意属性上右键，选择「复制完整数据路径」，然后粘贴到花括号内。",
     }
 )  # fmt: skip

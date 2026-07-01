@@ -1,9 +1,37 @@
+import logging
 import os
+import re
 from collections import defaultdict
 from datetime import datetime
 from typing import TypedDict
 
 import bpy
+
+logger = logging.getLogger(__name__)
+
+BPY_EXPR_PATTERN = re.compile(r"\{bpy\.[^}!:{]*(?:![^}:]*)?(?::[^}]*)?\}")
+
+BURN_IN_POSITIONS = [
+    "top_left",
+    "top_center",
+    "top_right",
+    "bottom_left",
+    "bottom_center",
+    "bottom_right",
+]
+
+
+def _sanitize_bpy_key(expr: str) -> str:
+    """Sanitize a bpy expression into a valid format_map key.
+
+    ``bpy.data.objects[\"Cube\"].location[0]`` -> ``bpy_data_objects(Cube)_location(0)``
+    """
+    s = expr.replace(".", "_")
+    s = s.replace("[", "(")
+    s = s.replace("]", ")")
+    s = s.replace("\"", "")
+    s = s.replace("'", "")
+    return s
 
 
 class MetaData(TypedDict):
@@ -43,6 +71,67 @@ META_DATA_DESCRIPTIONS = {
     "camera_sensor_width": "Sensor width of the active camera in mm",
     "camera_sensor_height": "Sensor height of the active camera in mm",
 }
+
+
+def get_bpy_rna_values(context: bpy.types.Context) -> dict:
+    """Extract and evaluate all {bpy.xxx} RNA expressions from burn-in text fields.
+
+    Returns a dict of {sanitized_key: value}, or empty dict if burn-in is
+    disabled or no expressions are found.
+    """
+    burn_in = context.scene.anim_reviewer.burn_in
+    if not burn_in.enable:
+        return {}
+
+    expressions = set()
+    for pos in BURN_IN_POSITIONS:
+        for match in BPY_EXPR_PATTERN.finditer(getattr(burn_in, pos)):
+            raw = match.group()[1:-1]
+            expr = raw.split("!")[0].split(":")[0]
+            expressions.add(expr)
+
+    if not expressions:
+        return {}
+
+    result = {}
+    for expr in expressions:
+        try:
+            value = eval(expr, {"bpy": bpy})
+            if isinstance(value, float):
+                value = round(value, 2)
+            result[_sanitize_bpy_key(expr)] = value
+        except Exception as e:
+            logger.warning('Failed to evaluate burn-in expression "%s": %s', expr, e)
+            result[_sanitize_bpy_key(expr)] = ""
+    return result
+
+
+def resolve_text(text: str, metadata: defaultdict) -> str:
+    """Replace {bpy.xxx} expressions and standard metadata placeholders in text.
+
+    {bpy.xxx} patterns are first transformed to use sanitized keys, then
+    standard format_map resolves all placeholders against the metadata dict.
+    """
+    def _replacer(match):
+        inner = match.group()[1:-1]
+        conv = ""
+        fmt = ""
+        rest = inner
+        if "!" in rest:
+            expr, _, rest = rest.partition("!")
+            conv, _, fmt = rest.partition(":")
+            conv = "!" + conv
+            if fmt:
+                fmt = ":" + fmt
+        elif ":" in rest:
+            expr, _, fmt = rest.partition(":")
+            fmt = ":" + fmt
+        else:
+            expr = rest
+        return "{" + _sanitize_bpy_key(expr) + conv + fmt + "}"
+
+    text = BPY_EXPR_PATTERN.sub(_replacer, text)
+    return text.format_map(metadata)
 
 
 def get_metadata(context: bpy.types.Context, is_rendering: bool = False) -> MetaData:
@@ -108,5 +197,7 @@ def get_metadata(context: bpy.types.Context, is_rendering: bool = False) -> Meta
         "camera_sensor_width": camera_sensor_width,
         "camera_sensor_height": camera_sensor_height,
     }
+
+    metadata.update(get_bpy_rna_values(context))
 
     return defaultdict(str, metadata)
