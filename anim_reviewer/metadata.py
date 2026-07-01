@@ -22,6 +22,8 @@ class MetaData(TypedDict):
     frame_rate: int
     camera_name: str
     camera_focal: float
+    camera_sensor_width: float
+    camera_sensor_height: float
 
 
 META_DATA_DESCRIPTIONS = {
@@ -38,6 +40,8 @@ META_DATA_DESCRIPTIONS = {
     "frame_rate": "Frame rate of the playblast",
     "camera_name": "Name of the active camera",
     "camera_focal": "Focal length of the active camera in mm",
+    "camera_sensor_width": "Sensor width of the active camera in mm",
+    "camera_sensor_height": "Sensor height of the active camera in mm",
 }
 
 
@@ -79,9 +83,13 @@ def get_metadata(context: bpy.types.Context, is_rendering: bool = False) -> Meta
     if camera and camera.type == "CAMERA":
         camera_focal = f"{camera.data.lens:.2f}"
         camera_name = camera.name
+        camera_sensor_width = f"{camera.data.sensor_width:.1f}"
+        camera_sensor_height = f"{camera.data.sensor_height:.1f}"
     else:
         camera_focal = ""
         camera_name = ""
+        camera_sensor_width = ""
+        camera_sensor_height = ""
 
     metadata: MetaData = {
         "datetime": datetime.now().isoformat(sep=" ", timespec="seconds"),
@@ -97,6 +105,8 @@ def get_metadata(context: bpy.types.Context, is_rendering: bool = False) -> Meta
         "frame_rate": int(render.fps),
         "camera_name": camera_name,
         "camera_focal": camera_focal,
+        "camera_sensor_width": camera_sensor_width,
+        "camera_sensor_height": camera_sensor_height,
     }
 
     return defaultdict(str, metadata)

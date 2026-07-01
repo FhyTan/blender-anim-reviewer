@@ -525,5 +525,7 @@ translations_dict["zh_HANS"].update(
         ("*", "Frame rate of the playblast"): "拍屏帧率",
         ("*", "Name of the active camera"): "激活相机的名称",
         ("*", "Focal length of the active camera in mm"): "激活相机的焦距（毫米）",
+        ("*", "Sensor width of the active camera in mm"): "激活相机的传感器宽度（毫米）",
+        ("*", "Sensor height of the active camera in mm"): "激活相机的传感器高度（毫米）",
     }
 )  # fmt: skip
