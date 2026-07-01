@@ -77,6 +77,4 @@ All code, comments, docstrings, and logging must be in English. Non-English text
 
 Translations are in `anim_reviewer/translations.py` as auto-generated Blender i18n tuples. Currently has `zh_HANS` (Chinese Simplified). The comment at the top says the block can be safely moved and edited by hand.
 
-## Version
 
-Current: `1.0.3` (in both `pyproject.toml` and `blender_manifest.toml`).
