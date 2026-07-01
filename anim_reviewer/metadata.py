@@ -1,3 +1,4 @@
+import functools
 import logging
 import os
 import re
@@ -9,6 +10,7 @@ import bpy
 
 logger = logging.getLogger(__name__)
 
+ALL_PLACEHOLDER_PATTERN = re.compile(r"\{([^}]+)\}")
 BPY_EXPR_PATTERN = re.compile(r"\{bpy\.[^}!:{]*(?:![^}:]*)?(?::[^}]*)?\}")
 
 BURN_IN_POSITIONS = [
@@ -20,18 +22,23 @@ BURN_IN_POSITIONS = [
     "bottom_right",
 ]
 
-
-def _sanitize_bpy_key(expr: str) -> str:
-    """Sanitize a bpy expression into a valid format_map key.
-
-    ``bpy.data.objects[\"Cube\"].location[0]`` -> ``bpy_data_objects(Cube)_location(0)``
-    """
-    s = expr.replace(".", "_")
-    s = s.replace("[", "(")
-    s = s.replace("]", ")")
-    s = s.replace("\"", "")
-    s = s.replace("'", "")
-    return s
+META_DATA_DESCRIPTIONS = {
+    "datetime": "Current date and time",
+    "width": "Playblast width in pixels",
+    "height": "Playblast height in pixels",
+    "file_name": "Name of the output file without extension",
+    "file_version": "Version string of the output file",
+    "file_ext": "File extension of the output file",
+    "file_full_name": "Full name of the output file with extension",
+    "frame_current": "Current frame number",
+    "frame_start": "Start frame of the playblast",
+    "frame_end": "End frame of the playblast",
+    "frame_rate": "Frame rate of the playblast",
+    "camera_name": "Name of the active camera",
+    "camera_focal": "Focal length of the active camera in mm",
+    "camera_sensor_width": "Sensor width of the active camera in mm",
+    "camera_sensor_height": "Sensor height of the active camera in mm",
+}
 
 
 class MetaData(TypedDict):
@@ -54,23 +61,42 @@ class MetaData(TypedDict):
     camera_sensor_height: float
 
 
-META_DATA_DESCRIPTIONS = {
-    "datetime": "Current date and time",
-    "width": "Playblast width in pixels",
-    "height": "Playblast height in pixels",
-    "file_name": "Name of the output file without extension",
-    "file_version": "Version string of the output file",
-    "file_ext": "File extension of the output file",
-    "file_full_name": "Full name of the output file with extension",
-    "frame_current": "Current frame number",
-    "frame_start": "Start frame of the playblast",
-    "frame_end": "End frame of the playblast",
-    "frame_rate": "Frame rate of the playblast",
-    "camera_name": "Name of the active camera",
-    "camera_focal": "Focal length of the active camera in mm",
-    "camera_sensor_width": "Sensor width of the active camera in mm",
-    "camera_sensor_height": "Sensor height of the active camera in mm",
-}
+@functools.lru_cache(maxsize=128)
+def _sanitize_bpy_key(expr: str) -> str:
+    """Sanitize a bpy expression into a valid format_map key.
+
+    ``bpy.data.objects[\"Cube\"].location[0]`` -> ``bpy_data_objects(Cube)_location(0)``
+    """
+    s = expr.replace(".", "_")
+    s = s.replace("[", "(")
+    s = s.replace("]", ")")
+    s = s.replace('"', "")
+    s = s.replace("'", "")
+    return s
+
+
+def find_first_burn_in_error(text: str) -> tuple[str, str] | None:
+    """Find the first invalid placeholder in burn-in text.
+
+    Returns ``(placeholder, error_msg)`` or ``None`` if all valid.
+    """
+    if not text:
+        return None
+
+    for match in ALL_PLACEHOLDER_PATTERN.finditer(text):
+        inner = match.group(1)
+        if inner.startswith("bpy."):
+            expr = inner.split("!")[0].split(":")[0]
+            try:
+                eval(expr, {"bpy": bpy})
+            except Exception as e:
+                return (f"{{{inner}}}", str(e))
+        else:
+            key = inner.split("!")[0].split(":")[0]
+            if key not in META_DATA_DESCRIPTIONS:
+                return (f"{{{inner}}}", f"Unknown variable: {key}")
+
+    return None
 
 
 def get_bpy_rna_values(context: bpy.types.Context) -> dict:
@@ -112,6 +138,7 @@ def resolve_text(text: str, metadata: defaultdict) -> str:
     {bpy.xxx} patterns are first transformed to use sanitized keys, then
     standard format_map resolves all placeholders against the metadata dict.
     """
+
     def _replacer(match):
         inner = match.group()[1:-1]
         conv = ""

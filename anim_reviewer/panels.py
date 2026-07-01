@@ -1,7 +1,7 @@
 import bpy
 from bl_ui.utils import PresetPanel
 
-from .metadata import META_DATA_DESCRIPTIONS
+from .metadata import META_DATA_DESCRIPTIONS, BURN_IN_POSITIONS, find_first_burn_in_error
 
 
 class ANIM_REVIEWER_PT_presets(PresetPanel, bpy.types.Panel):
@@ -152,12 +152,19 @@ class ANIM_REVIEWER_PT_burn_in(bpy.types.Panel):
         col.prop(burn_in_props, "font_size")
         col.prop(burn_in_props, "margin")
         col.prop(burn_in_props, "color")
-        col.prop(burn_in_props, "top_left")
-        col.prop(burn_in_props, "top_center")
-        col.prop(burn_in_props, "top_right")
-        col.prop(burn_in_props, "bottom_left")
-        col.prop(burn_in_props, "bottom_center")
-        col.prop(burn_in_props, "bottom_right")
+
+        for field_name in BURN_IN_POSITIONS:
+            text = getattr(burn_in_props, field_name)
+            error = find_first_burn_in_error(text)
+            row = col.row()
+            if error:
+                row.alert = True
+            row.prop(burn_in_props, field_name)
+            if error:
+                placeholder, error_msg = error
+                sub = col.column()
+                sub.alert = True
+                sub.label(text=f"Error: {placeholder} - {error_msg}", icon="ERROR")
 
 
 class ANIM_REVIEWER_PT_burn_in_help(bpy.types.Panel):
