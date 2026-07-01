@@ -2,6 +2,7 @@ import json
 import os
 import shutil
 import subprocess
+from collections import defaultdict
 from contextlib import contextmanager
 from datetime import datetime
 from pathlib import Path
@@ -155,7 +156,7 @@ class ANIM_REVIEWER_OT_run(bpy.types.Operator):
             "For batch scripts set to False to prevent popping up the player."
         ),
         default=True,
-    ) # type: ignore
+    )  # type: ignore
 
     @classmethod
     def poll(cls, context: bpy.types.Context) -> bool:
@@ -360,7 +361,7 @@ class ANIM_REVIEWER_OT_run(bpy.types.Operator):
         dialogues = []
         template_dialogue = "Dialogue: 0,{start},{end},default,,0,0,0,,{{\\an{align}\\pos({x},{y})}}{text}"
         for frame in range(self.frame_start, self.frame_end + 1):
-            metadata = scene.anim_reviewer["metadata"][str(frame)]
+            metadata = defaultdict(str, scene.anim_reviewer["metadata"][str(frame)])
             start = frame_to_timecode(frame - self.frame_start, fps)
             end = frame_to_timecode(frame - self.frame_start + 1, fps)
 
@@ -491,7 +492,7 @@ class ANIM_REVIEWER_OT_import_settings(bpy.types.Operator, ImportHelper):
     bl_description = "Import Anim Reviewer settings from a file"
 
     filename_ext = ".json"
-    filter_glob: bpy.props.StringProperty(default="*.json", options={"HIDDEN"}) # type: ignore
+    filter_glob: bpy.props.StringProperty(default="*.json", options={"HIDDEN"})  # type: ignore
 
     def execute(self, context):
         anim_reviewer = context.scene.anim_reviewer
@@ -518,7 +519,7 @@ class ANIM_REVIEWER_OT_export_settings(bpy.types.Operator, ExportHelper):
     bl_description = "Export current Anim Reviewer settings to a file"
 
     filename_ext = ".json"
-    filter_glob: bpy.props.StringProperty(default="*.json", options={"HIDDEN"}) # type: ignore
+    filter_glob: bpy.props.StringProperty(default="*.json", options={"HIDDEN"})  # type: ignore
 
     def execute(self, context: bpy.types.Context):
         anim_reviewer = context.scene.anim_reviewer
