@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.1
+
+- Fixed an error for `Run Anim Review` operator in Blender 5.2 due this official commit: <https://projects.blender.org/blender/blender/commit/4ecb84f7bd588c121f7ae701315dbc4a800be72e>
+
 ## 1.1.0
 
 - Added `{camera_sensor_width}` and `{camera_sensor_height}` metadata variables for burn-in text.
