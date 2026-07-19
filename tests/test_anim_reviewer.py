@@ -1,3 +1,5 @@
+# Pytest could not be work until I refactor the operator that not depend on context.area
+
 import bpy
 import pytest
 
@@ -43,7 +45,3 @@ def test_playblast_with_different_system_output_file_format(create_camera_and_cu
 
     scene.render.image_settings.file_format = "OPEN_EXR_MULTILAYER1"
     bpy.ops.render.anim_review(launch_player=False)
-
-
-if __name__ == "__main__":
-    pytest.main([__file__])

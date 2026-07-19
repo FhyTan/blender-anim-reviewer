@@ -55,16 +55,22 @@ def play_video(video_path: str):
     preset = prefs.filepaths.animation_player_preset
 
     # try and guess a command line if it doesn't exist
+    # new variable `found_version` added from blender 5.2.0
+    found_version = (0, 0, 0)
     if preset == "CUSTOM":
         player_path = prefs.filepaths.animation_player
     else:
-        player_path = guess_player_path(preset)
+        if bpy.app.version >= (5, 2, 0):
+            player_path, found_version = guess_player_path(preset)
+        else:
+            player_path = guess_player_path(preset)
 
     file = bpy.path.abspath(video_path)
     if not os.path.exists(file):
         err_msg = rpt_("File not found: {!r}").format(file)
         raise FileNotFoundError(err_msg)
 
+    remove_OCIO_env = False
     cmd = [player_path]
     # extra options, fps controls etc.
     if scene.use_preview_range:
@@ -104,18 +110,40 @@ def play_video(video_path: str):
         ]
         cmd.extend(opts)
     elif preset == "DJV":
-        opts = [
-            file,
-            "-speed",
-            str(fps_final),
-            "-in_out",
-            str(frame_start),
-            str(frame_end),
-            "-frame",
-            str(scene.frame_current),
-            "-time_units",
-            "Frames",
-        ]
+        if found_version >= (3, 4, 0):
+            opts = [
+                file,
+                "-speed",
+                str(fps_final),
+                "-in",
+                str(frame_start),
+                "-out",
+                str(frame_end),
+                "-seek",
+                str(scene.frame_current),
+                "-timeUnits",
+                "Frames",
+            ]
+        elif found_version >= (3, 0, 0):
+            opts = [
+                file,
+                "-speed",
+                str(fps_final),
+            ]
+        else:
+            remove_OCIO_env = True
+            opts = [
+                file,
+                "-speed",
+                str(fps_final),
+                "-in_out",
+                str(frame_start),
+                str(frame_end),
+                "-frame",
+                str(scene.frame_current),
+                "-time_units",
+                "Frames",
+            ]
         cmd.extend(opts)
     elif preset == "FRAMECYCLER":
         opts = [file, "{:d}-{:d}".format(scene.frame_start, scene.frame_end)]
@@ -144,14 +172,21 @@ def play_video(video_path: str):
     print("Executing command:\n ", " ".join(quote(c) for c in cmd))
 
     try:
+        env_copy = os.environ.copy()
+        if remove_OCIO_env:
+            env_copy.pop("OCIO", None)
+
         if platform.system() == "Windows":
             # CREATE_NEW_CONSOLE option can make the player display on top of the Blender window.
             subprocess.Popen(
-                cmd, shell=True, creationflags=subprocess.CREATE_NEW_CONSOLE
+                cmd,
+                shell=True,
+                env=env_copy,
+                creationflags=subprocess.CREATE_NEW_CONSOLE,
             )
         else:
             # On non-Windows platforms, just launch the player without creating a new console.
-            subprocess.Popen(cmd)
+            subprocess.Popen(cmd, env=env_copy)
     except Exception as ex:
         err_msg = rpt_(
             "Couldn't run external animation player with command {!r}\n{:s}"
