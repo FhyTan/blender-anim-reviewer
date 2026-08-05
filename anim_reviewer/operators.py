@@ -6,7 +6,6 @@ from collections import defaultdict
 from contextlib import contextmanager
 from datetime import datetime
 from pathlib import Path
-from tempfile import TemporaryDirectory
 
 import bpy
 from bl_operators.presets import AddPresetBase
@@ -15,7 +14,13 @@ from bpy_extras.io_utils import ExportHelper, ImportHelper
 
 from .metadata import get_metadata, resolve_text
 from .paths import BFONT_PATH, TEMPLATE_ASS_PATH
-from .utils import detect_ffmpeg, get_full_font_name, play_video
+from .utils import (
+    detect_ffmpeg,
+    get_full_font_name,
+    play_video,
+    temporary_directory,
+    wait_for_file_stable,
+)
 
 
 @contextmanager
@@ -193,7 +198,7 @@ class ANIM_REVIEWER_OT_run(bpy.types.Operator):
 
         with (
             bpy.context.temp_override(area=area, region=region),
-            TemporaryDirectory(prefix="blender_anim_reviewer_") as temp_dir,
+            temporary_directory(prefix="blender_anim_reviewer_") as temp_dir,
             render_properties_override(context),
             register_collect_metadata_handler(context),
         ):
@@ -221,7 +226,8 @@ class ANIM_REVIEWER_OT_run(bpy.types.Operator):
                 self.frame_end = context.scene.frame_end
 
             self.build_subtitles(context)
-            self.build_audio(context)
+            if not self.build_audio(context):
+                return {"CANCELLED"}
             self.build_video(context)
 
         return {"FINISHED"}
@@ -389,18 +395,38 @@ class ANIM_REVIEWER_OT_run(bpy.types.Operator):
         with open(self.temp_sub, "w", encoding="utf-8") as f:
             f.write(subtitles)
 
-    def build_audio(self, context: bpy.types.Context):
-        """Build audio file use blender's built-in tools."""
+    def build_audio(self, context: bpy.types.Context) -> bool:
+        """Build audio file use blender's built-in tools.
+
+        Returns True when the audio is ready, False when it could not be rendered.
+        """
 
         if not context.scene.anim_reviewer.video.include_audio:
-            return
+            return True
 
-        # Render audio
-        bpy.ops.sound.mixdown(
-            filepath=self.temp_aud.as_posix(),
-            container="MP3",
-            codec="MP3",
-        )
+        try:
+            # Render audio
+            bpy.ops.sound.mixdown(
+                filepath=self.temp_aud.as_posix(),
+                container="MP3",
+                codec="MP3",
+            )
+        except RuntimeError:
+            self.report({"ERROR"}, "Failed to render audio.")
+            return False
+
+        # Since Blender 5.0 `sound.mixdown` runs asynchronously in a background
+        # WM job, so the audio file may still be growing (and locked) when the
+        # operator returns. Wait for it to be fully written before ffmpeg reads
+        # it and the temporary directory is cleaned up.
+        if not wait_for_file_stable(self.temp_aud):
+            self.report(
+                {"ERROR"},
+                "Failed to render audio (sound.mixdown timed out).",
+            )
+            return False
+
+        return True
 
     def build_video(self, context: bpy.types.Context):
         """Build video from the rendered frames using ffmpeg."""

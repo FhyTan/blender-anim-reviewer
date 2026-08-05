@@ -1,10 +1,17 @@
+import logging
 import os
 import platform
 import shutil
 import subprocess
+import tempfile
+import time
+from contextlib import contextmanager
+from pathlib import Path
 
 import bpy
 from bpy.app.translations import pgettext_rpt as rpt_
+
+logger = logging.getLogger(__name__)
 
 
 def get_full_font_name(ttf_path) -> str:
@@ -13,6 +20,66 @@ def get_full_font_name(ttf_path) -> str:
     with ttLib.TTFont(ttf_path) as font:
         full_name = font["name"].getDebugName(4)
     return full_name
+
+
+def wait_for_file_stable(
+    path: Path,
+    timeout: float = 60.0,
+    stable_samples: int = 2,
+    interval: float = 0.3,
+    grace: float = 0.5,
+) -> bool:
+    """Wait until `path` exists and its size stops growing.
+
+    Since Blender 5.0, ``bpy.ops.sound.mixdown`` runs asynchronously in a
+    background WM job, so the operator returns before the audio file is fully
+    written. Polling until the file size stays stable ensures the file is
+    complete and no longer locked before it is consumed or deleted.
+    """
+
+    deadline = time.monotonic() + timeout
+    last_size = -1
+    stable = 0
+
+    while time.monotonic() < deadline:
+        size = path.stat().st_size if path.exists() else -1
+
+        if size > 0 and size == last_size:
+            stable += 1
+            if stable >= stable_samples:
+                time.sleep(grace)
+                return True
+        else:
+            last_size = size
+            stable = 0
+
+        time.sleep(interval)
+
+    return False
+
+
+@contextmanager
+def temporary_directory(prefix: str = "blender_anim_reviewer_"):
+    """Create a temporary directory that tolerates files locked on Windows.
+
+    Blender's background mixdown job (or antivirus/OS indexers) may briefly
+    keep files in the directory open, which makes ``TemporaryDirectory``
+    cleanup raise PermissionError. Removal is retried and, as a last resort,
+    the directory is left in the system temp folder instead of crashing.
+    """
+
+    dir_path = Path(tempfile.mkdtemp(prefix=prefix))
+    try:
+        yield dir_path
+    finally:
+        for _ in range(3):
+            try:
+                shutil.rmtree(dir_path)
+                break
+            except OSError:
+                time.sleep(0.2)
+        else:
+            logger.warning(f"Can not remove temp dir {dir_path}, skipped!")
 
 
 def detect_ffmpeg() -> bool:

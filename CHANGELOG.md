@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.2
+
+- Fixed a `PermissionError [WinError 32]` crash when cleaning up the temporary folder on Windows in Blender 5.x, caused by the audio mixdown running asynchronously in a background job that still holds `audio.mp3` open.
+- Wait for the mixdown output file to be fully written before encoding the video, preventing truncated audio.
+- Made temporary directory cleanup tolerant of files still held open by other processes.
+
 ## 1.1.1
 
 - Fixed an error for `Run Anim Review` operator in Blender 5.2 due this official commit: <https://projects.blender.org/blender/blender/commit/4ecb84f7bd588c121f7ae701315dbc4a800be72e>
