@@ -23,6 +23,8 @@ BURN_IN_POSITIONS = [
 ]
 
 META_DATA_DESCRIPTIONS = {
+    "blender_name": "Name of the current Blender file",
+    "blender_path": "Full path of the current Blender file",
     "datetime": "Current date and time",
     "width": "Playblast width in pixels",
     "height": "Playblast height in pixels",
@@ -44,6 +46,8 @@ META_DATA_DESCRIPTIONS = {
 class MetaData(TypedDict):
     """The metadata used to replace the placeholders for burn-in text."""
 
+    blender_name: str
+    blender_path: str
     datetime: str
     width: int
     height: int
@@ -207,7 +211,16 @@ def get_metadata(context: bpy.types.Context, is_rendering: bool = False) -> Meta
         camera_sensor_width = ""
         camera_sensor_height = ""
 
+    # Get current Blender file name
+    blender_file_path = bpy.data.filepath
+    if blender_file_path:
+        blender_name = os.path.splitext(os.path.basename(blender_file_path))[0]
+    else:
+        blender_name = "Untitled"
+
     metadata: MetaData = {
+        "blender_name": blender_name,
+        "blender_path": blender_file_path,
         "datetime": datetime.now().isoformat(sep=" ", timespec="seconds"),
         "width": res_x,
         "height": res_y,
