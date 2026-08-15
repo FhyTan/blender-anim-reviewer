@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.1.3
+
+- Added `{blender_name}` metadata variable for burn-in text, returning the current Blender file name without extension (falls back to `Untitled` when unsaved).
+- Added `{blender_path}` metadata variable for burn-in text, returning the full path of the current Blender file (empty when unsaved).
+
 ## 1.1.2
 
 - Fixed a `PermissionError [WinError 32]` crash when cleaning up the temporary folder on Windows in Blender 5.x, caused by the audio mixdown running asynchronously in a background job that still holds `audio.mp3` open.
