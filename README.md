@@ -1,3 +1,5 @@
+
+
 [English](README.md) | [中文](README.zh-CN.md)
 
 # Enhanced Blender Playblast Review Plugin
@@ -12,7 +14,7 @@ You can install it from official extension website:
 ## System Requirements
 
 - Blender 4.2.0 or higher
-- FFmpeg (required for video processing)
+- FFmpeg (required for video processing; must be available in PATH)
 
 Due to some limitations of the Blender Python API, using this plugin requires FFmpeg to be installed on your computer first for video processing and compositing.
 
